@@ -1,0 +1,59 @@
+---
+title: "nipah_case"
+author: "Tao Huang"
+date: "April 9, 2019"
+output: html_document
+---
+
+#read the data
+```{r}
+setwd("C:/Users/huangt/Documents/bat_virus")
+case<-read.csv("Nipah_case.csv",header=T,sep=',')
+
+```
+
+
+
+```{r}
+#shuts down the specified
+graphics.off()
+par(mar=c(4,4,4,4))
+plot(case$year,case$No..cases)
+par(new=T)
+plot(case$year,case$Case.Fatality.Rate,col="red")
+```
+
+#aggregate by year
+```{r}
+case$No..cases<-as.numeric(case$No..cases)
+case$No..deaths<-as.numeric(case$No..deaths)
+
+agg <-aggregate( case[,c("No..cases","No..deaths")]
+                     , by=list( case$year), 
+  FUN= sum, na.rm=TRUE)
+agg$rate<-agg$No..deaths/agg$No..cases
+
+```
+
+```{r}
+library("tidyverse")
+g <- ggplot(agg, aes( agg$Group.1, agg$No..cases))
+g + geom_line()
+```
+
+
+```{r}
+#shuts down the specified
+graphics.off()
+par(mar=c(4,4,4,4))
+plot( agg$Group.1,agg$No..cases,ylab="Cases",xlab="Year")
+par(new=T)
+plot( agg$Group.1, 100*agg$rate,col="red"
+      #,ylab=" "
+      ,axes=F,ylab="",xlab="",ylim=c(0,100),type="l")
+mtext(side = 4, line = 3, 'Fatality %',col="red")
+axis(side = 4)
+legend(1, 95, legend=c("Line 1", "Line 2"),
+       col=c("red", "blue"), lty=1:2, cex=0.8)
+```
+
